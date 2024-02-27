@@ -1,37 +1,24 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
+import WeatherService from './weather-service.js'
 
 // Business Logic
 
 function getWeather(city) {
-  let promise = new Promise(function(resolve, reject) {
-    let request = new XMLHttpRequest();
-    const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.API_KEY}`;
-    request.addEventListener("loadend", function() {
-      const response = JSON.parse(this.responseText);
-      if (this.status === 200) {
-        resolve([response, city]);
-      } else {
-        reject([this, response, city]);
-      }
-    });
-    request.open("GET", url, true);
-    request.send();
-  });
-
-  promise.then(function(response) {
-    printElements(response);
-  }, function(errorMessage) {
-    printError(errorMessage);
+  let promise = WeatherService.getWeather(city);
+  promise.then(function(weatherDataArray) {
+    printElements(weatherDataArray);
+  }, function(errorArray) {
+    printError(errorArray);
   });
 }
 
 // UI Logic
 
-function printElements(results) {
-  document.querySelector('#showResponse').innerText = `The humidity in ${results[1]} is ${results[0].main.humidity}%.
-  The temperature in Kelvins is ${results[0].main.temp} degrees.`;
+function printElements(data) {
+  document.querySelector('#showResponse').innerText = `The humidity in ${data[1]} is ${data[0].main.humidity}%.
+  The temperature in Kelvins is ${data[0].main.temp} degrees.`;
 }
 
 function printError(error) {
